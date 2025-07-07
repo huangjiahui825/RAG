@@ -1,0 +1,22 @@
+[
+  {
+    "pdf": "LoRA.pdf",
+    "query": "what's the key advantages of LoRA?",
+    "golden_context": "LoRA possesses several key advantages.\n• A pre-trained model can be shared and used to build many small LoRA modules for dif\u0002ferent tasks. We can freeze the shared model and efficiently switch tasks by replacing the\nmatrices A and B in Figure 1, reducing the storage requirement and task-switching over\u0002head significantly.\n• LoRA makes training more efficient and lowers the hardware barrier to entry by up to 3\ntimes when using adaptive optimizers since we do not need to calculate the gradients or\nmaintain the optimizer states for most parameters. Instead, we only optimize the injected,\nmuch smaller low-rank matrices.\n• Our simple linear design allows us to merge the trainable matrices with the frozen weights\nwhen deployed, introducing no inference latency compared to a fully fine-tuned model, by\nconstruction.\n• LoRA is orthogonal to many prior methods and can be combined with many of them, such\nas prefix-tuning. We provide an example in Appendix E."
+  },
+  {
+    "pdf": "LoRA.pdf",
+    "query": "Lora's practical benefits, advantages and limitations.",
+    "golden_context": "Practical Benefits and Limitations. The most significant benefit comes from the reduction in\nmemory and storage usage. For a large Transformer trained with Adam, we reduce that VRAM\nusage by up to 2/3 if r \u001C dmodel as we do not need to store the optimizer states for the frozen\nparameters. On GPT-3 175B, we reduce the VRAM consumption during training from 1.2TB to\n350GB. With r = 4 and only the query and value projection matrices being adapted, the checkpoint\nsize is reduced by roughly 10,000× (from 350GB to 35MB)4\n. This allows us to train with signifi-\ncantly fewer GPUs and avoid I/O bottlenecks. Another benefit is that we can switch between tasks\nwhile deployed at a much lower cost by only swapping the LoRA weights as opposed to all the\nparameters. This allows for the creation of many customized models that can be swapped in and out\non the fly on machines that store the pre-trained weights in VRAM. We also observe a 25% speedup\nduring training on GPT-3 175B compared to full fine-tuning5\nas we do not need to calculate the\ngradient for the vast majority of the parameters.\nLoRA also has its limitations. For example, it is not straightforward to batch inputs to different tasks\nwith different A and B in a single forward pass, if one chooses to absorb A and B into W to eliminate\nadditional inference latency. Though it is possible to not merge the weights and dynamically choose\nthe LoRA modules to use for samples in a batch for scenarios where latency is not critical."
+  },
+  {
+    "pdf": "LoRA.pdf",
+    "query": "which WEIGHT MATRICES IN TRANSFORMER SHOULD WE APPLY LORA TO?",
+    "golden_context": "Given a limited parameter budget, which types of weights should we adapt with LoRA to obtain\nthe best performance on downstream tasks? As mentioned in Section 4.2, we only consider weight\nmatrices in the self-attention module. We set a parameter budget of 18M (roughly 35MB if stored\nin FP16) on GPT-3 175B, which corresponds to r = 8 if we adapt one type of attention weights or\nr = 4 if we adapt two types, for all 96 layers. The result is presented in Table 5."
+  },
+  {
+    "pdf": "LoRA.pdf",
+    "query": "What can we learn about LoRA in Table 3?",
+    "golden_context": "In the E2E NLG Challenge, LoRA (Low-Rank Adaptation) demonstrates strong performance with minimal trainable parameters. When applied to GPT-2 Medium and GPT-2 Large, LoRA uses only 0.35M and 0.77M trainable parameters, yet achieves the highest or near-highest scores across several key metrics—including BLEU (70.4), NIST (8.85/8.89), and ROUGE-L (71.8/72.0). In contrast, full fine-tuning (FT), which involves significantly more parameters (up to 774M), generally fails to outperform LoRA. Compared to other adapter-based methods with similar or slightly more parameter overhead, LoRA consistently delivers superior results. These findings highlight LoRA’s effectiveness in low-parameter adaptation settings, offering a compelling balance between efficiency and output quality."
+  }
+]
